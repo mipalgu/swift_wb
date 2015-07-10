@@ -14,8 +14,8 @@ let p = wb_point2d(x: 12, y: 34)
 wb.post(p, msg: kXEyesPos_v)
 let q: wb_point2d = wb.get(kXEyesPos_v)
 
-print("Got point at (\(p.x), \(p.y))")
-print("Got point at (\(q.x), \(q.y))")
+print("Posted    point at (\(p.x), \(p.y))")
+print("Received  point at (\(q.x), \(q.y))")
 
 extension Whiteboard {
     func get_point2d(msgno: Int32 = Int32(kXEyesPos_v.rawValue)) -> wb_point2d {
@@ -33,4 +33,4 @@ extension Whiteboard {
 wb.set_point2d(p)           // post wb message
 let r = wb.get_point2d()    // and get it back
 
-print("Got point at (\(r.x), \(r.y))")
+print("Extension point at (\(r.x), \(r.y))")
