@@ -14,10 +14,10 @@ public protocol Blackboard {
     static var number_of_messages: Int32 { get }
 
     /// get a message of a given type
-    func get<T>(msg: wb_types) -> T
+    func get<T>(_ msg: wb_types) -> T
 
     /// post a message of a given type to a given `wb_types` slot
-    func post<T>(val: T, msg: wb_types)
+    func post<T>(_ val: T, msg: wb_types)
 }
 
 
@@ -28,7 +28,7 @@ public struct Whiteboard: Blackboard {
 
     /// return ta pointer to the underlying C whiteboard infrastructure
     public var wb: UnsafeMutablePointer<gu_simple_whiteboard> {
-        return wbd.memory.wb
+        return wbd.pointee.wb
     }
 
     /// convenience class variable denoting the number of defined wb types
@@ -38,16 +38,14 @@ public struct Whiteboard: Blackboard {
     public init() { wbd = get_local_singleton_whiteboard() }
 
     /// get message template function
-    public func get<T>(msg: wb_types) -> T {
-        let msgp = UnsafePointer<T>(gsw_current_message(wb, Int32(msg.rawValue)))
-        return msgp.memory
+    public func get<T>(_ msg: wb_types) -> T {
+        return gsw_current_message(wb, Int32(msg.rawValue)).withMemoryRebound(to: T.self, capacity: 1) { $0.pointee }
     }
 
     /// post message template function
-    public func post<T>(val: T, msg: wb_types) {
+    public func post<T>(_ val: T, msg: wb_types) {
         let msgno = Int32(msg.rawValue)
-        let msgp = UnsafeMutablePointer<T>(gsw_next_message(wb, msgno))
-        msgp.memory = val
+        gsw_next_message(wb, msgno).withMemoryRebound(to: T.self, capacity: 1) { $0.pointee = val }
         gsw_increment(wb, msgno)
     }
 }
