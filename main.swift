@@ -26,6 +26,7 @@ extension Whiteboard {
         gsw_next_message(wb, msgno).withMemoryRebound(to: wb_point2d.self, capacity: 1) { $0.pointee = p }
         gsw_increment(wb, msgno)
         gsw_increment_event_counter(wb, msgno)
+        gsw_signal_subscribers(wb)
     }
 }
 
