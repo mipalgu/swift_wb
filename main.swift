@@ -25,6 +25,7 @@ extension Whiteboard {
     func set_point2d(_ p: wb_point2d, msgno: Int32 = Int32(kXEyesPos_v.rawValue)) {
         gsw_next_message(wb, msgno).withMemoryRebound(to: wb_point2d.self, capacity: 1) { $0.pointee = p }
         gsw_increment(wb, msgno)
+        gsw_increment_event_counter(wb, msgno)
     }
 }
 
