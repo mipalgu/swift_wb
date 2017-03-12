@@ -79,10 +79,24 @@ public class GenericWhiteboard<T> {
      *  The current index position of message.
      */
     public var currentIndex: UInt8 {
-        let _ = self.procure()
-        let index: UInt8 = self.indexes[self.msgTypeOffset]
-        let _ = self.vacate()
-        return index
+        get {
+            let _ = self.procure()
+            let index: UInt8 = self.indexes[self.msgTypeOffset]
+            let _ = self.vacate()
+            return index
+        } set {
+            if (false == self.procure()) {
+                return
+            }
+            let indexes: UnsafeBufferPointer<UInt8> = self.indexes
+            guard let base = indexes.baseAddress else {
+                fatalError("Cannot change currentIndex, indexes has not been initialized")
+            }
+            let p = base.advanced(by: self.msgTypeOffset)
+            let mu = UnsafeMutablePointer(mutating: p)
+            mu.pointee = (newValue % UInt8(generations))
+            let _ = self.vacate()
+        }
     }
 
     /**
@@ -100,10 +114,24 @@ public class GenericWhiteboard<T> {
      *  The current event count for the message.
      */
     public var eventCount: UInt16 {
-        let _ = self.procure()
-        let e: UInt16 = self.eventCounters[self.msgTypeOffset]
-        let _ = self.vacate()
-        return e
+        get {
+            let _ = self.procure()
+            let e: UInt16 = self.eventCounters[self.msgTypeOffset]
+            let _ = self.vacate()
+            return e
+        } set {
+            if (false == self.procure()) {
+                return
+            }
+            let eventCounters: UnsafeBufferPointer<UInt16> = self.eventCounters
+            guard let base = eventCounters.baseAddress else {
+                fatalError("Cannot change eventCount, eventCounters have not been initialized")
+            }
+            let p = base.advanced(by: self.msgTypeOffset)
+            let mu = UnsafeMutablePointer(mutating: p)
+            mu.pointee = newValue
+            let _ = self.vacate()
+        }
     }
 
     /**
@@ -192,10 +220,24 @@ public class GenericWhiteboard<T> {
      *  The message at `nextIndex`.
      */
     public var nextMessage: Message {
-        let _ = self.procure()
-        let m: Message = self.messages[Int(self.currentIndex) + 1 % self.generations]
-        let _ = self.vacate()
-        return m
+        get {
+            let _ = self.procure()
+            let m: Message = self.messages[Int(self.currentIndex) + 1 % self.generations]
+            let _ = self.vacate()
+            return m
+        } set {
+            if (false == self.procure()) {
+                return
+            }
+            let m: UnsafeBufferPointer<Message> = self.messages
+            guard let base = m.baseAddress else {
+                fatalError("Cannot change nextMessage, messages has not been initialized")
+            }
+            let p = base.advanced(by: Int(self.currentIndex + 1) % self.generations)
+            let mu = UnsafeMutablePointer(mutating: p)
+            mu.pointee = newValue
+            let _ = self.vacate()
+        }
     }
 
     /**
