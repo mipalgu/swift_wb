@@ -62,7 +62,7 @@ import CGUSimpleWhiteboard
  *  Provides a wrapper around `Whiteboard` that only works with a certain
  *  message.
  */
-public class GenericWhiteboard<T: ExternalVariables> {
+public class GenericWhiteboard<T> {
     
     /**
      *  The type of the message.
@@ -109,11 +109,11 @@ public class GenericWhiteboard<T: ExternalVariables> {
     /**
      *  Event counters for all messages types.
      */
-    public var eventCounters: Array<UInt16> {
-        return Array(UnsafeBufferPointer(
+    public var eventCounters: UnsafeBufferPointer<UInt16> {
+        return UnsafeBufferPointer(
             start: &self.gsw.pointee.event_counters.0,
             count: self.totalMessageTypes
-        ))
+        )
     }
 
     /**
@@ -136,11 +136,11 @@ public class GenericWhiteboard<T: ExternalVariables> {
     /**
      *  Indexes for all message types.
      */
-    public var indexes: Array<UInt8> {
-        return Array(UnsafeBufferPointer(
+    public var indexes: UnsafeBufferPointer<UInt8> {
+        return UnsafeBufferPointer(
             start: &self.gsw.pointee.indexes.0,
             count: self.totalMessageTypes
-        ))
+        )
     }
 
     /**
@@ -148,11 +148,11 @@ public class GenericWhiteboard<T: ExternalVariables> {
      *
      *  - SeeAlso: `ConvertibleCArray`
      */
-    public var messages: Array<Message> {
-        let first = &self.gsw.pointee.messages.0
+    public var messages: UnsafeBufferPointer<Message> {
+        let first = withUnsafeMutablePointer(to: &self.gsw.pointee.messages.0.0) { $0 }
         let start = first.withMemoryRebound(to: Message.self, capacity: 1) { $0 }
         let count = self.generations
-        return Array(UnsafeBufferPointer(start: start, count: count))
+        return UnsafeBufferPointer(start: start, count: count)
     }
 
     /**
@@ -161,7 +161,7 @@ public class GenericWhiteboard<T: ExternalVariables> {
      */
     public var orderedMessages: [Message] {
         let _ = self.procure()
-        let m: [Message] = self.messages
+        let m: UnsafeBufferPointer<Message> = self.messages
         var i: Int = Int(self.currentIndex)
         let generations: Int = self.generations
         var arr: [Message] = []
@@ -242,7 +242,7 @@ public class GenericWhiteboard<T: ExternalVariables> {
      */
     public func get() -> Message {
         let _ = self.procure()
-        let m: Message = self.wb.get(msg: self.msgType)
+        let m: Message = self.wb.get(self.msgType)
         let _ = self.vacate()
         return m
     }
@@ -268,7 +268,7 @@ public class GenericWhiteboard<T: ExternalVariables> {
         if (false == self.procure()) {
             return
         }
-        self.wb.post(val: val, msg: self.msgType)
+        self.wb.post(val, msg: self.msgType)
         gsw_increment_event_counter(self.wb.wb, Int32(self.msgType.rawValue))
         let _ = self.vacate()
         self.notifySubscribers()
