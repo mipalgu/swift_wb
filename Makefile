@@ -1,18 +1,32 @@
 #
 #	$Id$
 #
-# GU swift whiteboard Makefile
+# Global Makefile
 #
-ALL_TARGETS=host xc
-#CI_SERVER_DOC_SUBDIR=utils
+NO_DEFAULT_DEPENDENCIES_TARGETS=yes
 
-SWIFT_SRCS=swift_wb.swift main.swift
-SWIFT_BRIDGING_HEADER=swift_wb-Bridging-Header.h
-SWIFTCFLAGS=-I${SRCDIR}/../.. -I${SRCDIR}/../../../Common
+ALL_TARGETS=build
 
-XCPROJPATH?=${MODULE_DIR}/../gusimplewhiteboard.xcodeproj
+SWIFT_BUILD_CONFIG?=debug
 
-#USE_WB_LIB=yes				# libgusimplewhiteboard (not working)
+USE_WB_LIB=yes
 
-.include "../../../mk/whiteboard.mk"	# I need the C whiteboard
-.include "../../../mk/mipal.mk"		# comes last!
+#.include "../../mk/subdir.mk"		# required for meta-makefiles
+
+
+build:	clean
+	env swift build -c ${SWIFT_BUILD_CONFIG} ${SWIFTCFLAGS:=-Xswiftc %} ${CFLAGS:=-Xcc %} ${LDFLAGS:=-Xlinker %}
+	#cd machines && bmake && cd ../
+
+test:	clean
+	swift test ${SWIFTCFLAGS:=-Xswiftc %} ${CFLAGS:=-Xcc %} ${LDFLAGS:=-Xlinker %}
+
+clean:
+	swift build --clean
+	#cd machines && bmake clean && cd ../
+
+.include "../../mk/mipal.mk"		# comes last!
+
+.if ${OS} == Darwin
+LDFLAGS+=-lc++
+.endif

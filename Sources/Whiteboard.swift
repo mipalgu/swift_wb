@@ -1,10 +1,13 @@
 //
-//  swift_wb.swift
+//  Whiteboard.swift
 //  gusimplewhiteboard
 //
 //  Created by Rene Hexel on 5/11/2014.
 //  Copyright © 2014, 2015 Rene Hexel. All rights reserved.
 //
+
+import CGUSimpleWhiteboard
+
 /// Public protocol for blackboard-like functionality
 public protocol Blackboard {
     /// required constructor for a default whiteboard
