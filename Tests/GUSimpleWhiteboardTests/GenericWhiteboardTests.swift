@@ -57,7 +57,7 @@
  */
 
 import XCTest
-import CGUSimpleWhiteboard 
+import CGUSimpleWhiteboard
 @testable import GUSimpleWhiteboard
 
 public class GenericWhiteboardTests: XCTestCase {
@@ -81,7 +81,7 @@ public class GenericWhiteboardTests: XCTestCase {
     public override func setUp() {
         self.gwb = GenericWhiteboard<wb_count>(msgType: kCount_v, wb: self.wb)
         for _ in 0 ..< gwb.generations {
-            self.wb.post(val: wb_count(), msg: kCount_v)
+            self.wb.post(wb_count(count: 0), msg: kCount_v)
         }
         self.gwb.eventCount = 0
         self.gwb.currentIndex = 0
@@ -132,9 +132,9 @@ public class GenericWhiteboardTests: XCTestCase {
     }
 
     public func test_changeMessages() {
-        var m: UnsafeBufferPointer<wb_count> = gwb.messages
+        let m: UnsafeBufferPointer<wb_count> = gwb.messages
         let msg: wb_count = wb_count(count: 10)
-        m[2] = msg
+        UnsafeMutablePointer(mutating: m.baseAddress!.advanced(by: 2)).pointee = msg
         let m2: UnsafeBufferPointer<wb_count> = gwb.messages
         XCTAssertEqual(msg, m2[2])
         XCTAssertEqual(m[2], m2[2])
@@ -150,7 +150,7 @@ public class GenericWhiteboardTests: XCTestCase {
             XCTAssertEqual(count, wb_count(count: Int64(i)))
             i = i - 1
         }
-        XCTAssertEqual(gwb.orderedMessages, [(gwb.generations - 1)...0].map({wb_count(count: $0)}))
+        XCTAssertEqual(gwb.orderedMessages, Array((gwb.generations - 1)...0).map({wb_count(count: Int64($0))}))
     }
 
 }
