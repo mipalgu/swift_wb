@@ -1,0 +1,15 @@
+author	Carl Lusty
+float	HeadYaw  	//Head pos in RAD 
+float	HeadPitch  	//Head pos in RAD 
+float	LShoulderPitch	//RAD 
+float	LShoulderRoll	//RAD 
+float	LElbowYaw	//RAD 
+float	LElbowRoll	//RAD 
+float	RShoulderPitch	//RAD 
+float	RShoulderRoll	//RAD 
+float	RElbowYaw	//RAD 
+float	RElbowRoll	//RAD 
+
+@brief Body joint positions c struct
+
+
