@@ -2,5 +2,6 @@ import XCTest
 @testable import GUSimpleWhiteboardTests
 
 XCTMain([
-     testCase(GenericWhiteboardTests.allTests)
+    testCase(WhiteboardTests.allTests),
+    testCase(GenericWhiteboardTests.allTests)
 ])
