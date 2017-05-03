@@ -150,7 +150,7 @@ public class GenericWhiteboardTests: XCTestCase {
             XCTAssertEqual(count, wb_count(count: Int64(i)))
             i = i - 1
         }
-        XCTAssertEqual(gwb.orderedMessages, Array((gwb.generations - 1)...0).map({wb_count(count: Int64($0))}))
+        XCTAssertEqual(gwb.orderedMessages, Array(0...(gwb.generations - 1)).reversed().map({wb_count(count: Int64($0))}))
     }
 
 }
