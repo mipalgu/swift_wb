@@ -173,30 +173,27 @@ public class GenericWhiteboard<T> {
 
     /**
      *  All messages currently stored in the whiteboard.
-     *
-     *  - SeeAlso: `ConvertibleCArray`
      */
-    public var messages: UnsafeBufferPointer<Message> {
-        let first = withUnsafeMutablePointer(to: &self.gsw.pointee.messages.0.0) { $0 }
-        let start = first.withMemoryRebound(to: Message.self, capacity: 1) { $0 }
-        let count = self.generations
-        return UnsafeBufferPointer(start: start, count: count)
-    }
-
-    /**
-     *  All messages for the current message type, but they are ordered so that
-     *  the latest is first.
-     */
-    public var orderedMessages: [Message] {
+    public var messages: [Message] {
         let _ = self.procure()
-        let m: UnsafeBufferPointer<Message> = self.messages
-        var i: Int = Int(self.currentIndex)
-        let generations: Int = self.generations
+        let allMessages = UnsafeBufferPointer(
+            start: &self.gsw.pointee.messages.0,
+            count: self.totalMessageTypes
+        )
+        guard let p = allMessages.baseAddress?.advanced(by: self.msgTypeOffset) else {
+            return []
+        }
+        var messages = p.pointee
+        let first = withUnsafeMutablePointer(to: &messages.0) { $0 } 
+        let buffer = UnsafeBufferPointer(start: first, count: self.generations)
+        guard let base = buffer.baseAddress else {
+            let _ = self.vacate()
+            return []
+        }
         var arr: [Message] = []
-        arr.reserveCapacity(m.count)
-        for _ in 0 ..< generations {
-            arr.append(m[i])
-            i = 0 == i ? generations - 1 : i - 1
+        arr.reserveCapacity(self.generations)
+        for i in 0..<self.generations {
+            arr.append(base.advanced(by: i).withMemoryRebound(to: Message.self, capacity: 1) { $0 }.pointee)
         }
         let _ = self.vacate()
         return arr
@@ -229,13 +226,10 @@ public class GenericWhiteboard<T> {
             if (false == self.procure()) {
                 return
             }
-            let m: UnsafeBufferPointer<Message> = self.messages
-            guard let base = m.baseAddress else {
-                fatalError("Cannot change nextMessage, messages has not been initialized")
+            let msgno = Int32(self.msgType.rawValue)
+            gsw_next_message(self.wb.wb, msgno).withMemoryRebound(to: Message.self, capacity: 1) {
+                $0.pointee = newValue
             }
-            let p = base.advanced(by: Int(self.currentIndex + 1) % self.generations)
-            let mu = UnsafeMutablePointer(mutating: p)
-            mu.pointee = newValue
             let _ = self.vacate()
         }
     }
@@ -245,6 +239,23 @@ public class GenericWhiteboard<T> {
      */
     public var numTypes: UInt16 {
         return self.gsw.pointee.num_types
+    }
+
+    /**
+     *  All messages for the current message type, but they are ordered so that
+     *  the latest is first.
+     */
+    public var orderedMessages: [Message] {
+        let msgs = self.messages
+        var i: Int = Int(self.currentIndex)
+        let generations: Int = self.generations
+        var arr: [Message] = []
+        arr.reserveCapacity(msgs.count)
+        for _ in 0 ..< generations {
+            arr.append(msgs[i])
+            i = 0 == i ? generations - 1 : i - 1
+        }
+        return arr
     }
 
     public var subscribed: UInt16 {

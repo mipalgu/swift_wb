@@ -70,7 +70,6 @@ public class GenericWhiteboardTests: XCTestCase {
             ("test_postIncrementsIndex", test_postIncrementsIndex),
             ("test_postIncrementsEventCount", test_postIncrementsEventCount),
             ("test_messagesStoresTheMessage", test_messagesStoresTheMessage),
-            ("test_changeMessages", test_changeMessages),
             ("test_iteration", test_iteration)
         ]
     }
@@ -79,7 +78,7 @@ public class GenericWhiteboardTests: XCTestCase {
     private var gwb: GenericWhiteboard<wb_count>! 
 
     public override func setUp() {
-        self.gwb = GenericWhiteboard<wb_count>(msgType: kCount_v, wb: self.wb)
+        self.gwb = GenericWhiteboard<wb_count>(msgType: kCount_v, wb: self.wb, atomic: false)
         for _ in 0 ..< gwb.generations {
             self.wb.post(wb_count(count: 0), msg: kCount_v)
         }
@@ -124,20 +123,11 @@ public class GenericWhiteboardTests: XCTestCase {
     }
 
     public func test_messagesStoresTheMessage() {
-        let _: UnsafeBufferPointer<wb_count> = gwb.messages
+        let _: [wb_count] = gwb.messages
         let msg: wb_count = wb_count(count: 9)
         gwb.post(val: msg)
-        let _: UnsafeBufferPointer<wb_count> = gwb.messages
+        let _: [wb_count] = gwb.messages
         XCTAssertEqual(gwb.messages[Int(gwb.currentIndex)], msg)
-    }
-
-    public func test_changeMessages() {
-        let m: UnsafeBufferPointer<wb_count> = gwb.messages
-        let msg: wb_count = wb_count(count: 10)
-        UnsafeMutablePointer(mutating: m.baseAddress!.advanced(by: 2)).pointee = msg
-        let m2: UnsafeBufferPointer<wb_count> = gwb.messages
-        XCTAssertEqual(msg, m2[2])
-        XCTAssertEqual(m[2], m2[2])
     }
 
     public func test_iteration() {
