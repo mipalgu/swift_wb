@@ -23,7 +23,6 @@ public protocol Blackboard {
     func post<T>(_ val: T, msg: wb_types)
 }
 
-
 /// Swift convenience wrapper around gusimplewhiteboard
 public struct Whiteboard: Blackboard {
     /// pointer to the underlying C whiteboard implementation
@@ -58,4 +57,3 @@ public struct Whiteboard: Blackboard {
         gsw_increment(wb, msgno)
     }
 }
-

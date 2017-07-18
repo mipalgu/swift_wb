@@ -63,30 +63,34 @@ import CGUSimpleWhiteboard
 /** 
  * Contains a simple counter. 
  */ 
-extension wb_count { 
+extension wb_count {
 
-    public init () { 
-        self.count = 0 
+    public init () {
+        self.count = 0
     }
 
     public init(fromDictionary dictionary: [String: Any]) {
-        self.count = dictionary["count"] as! Int64
+        guard let count = dictionary["count"] as? Int64 else {
+            fatalError("Unable to fetch count from dictionary")
+        }
+        self.count = count
     }
 }
 
-extension wb_count: CustomStringConvertible { 
+extension wb_count: CustomStringConvertible {
 
-/** convert to a description string */  
-    public var description: String { 
+    /** convert to a description string */  
+    public var description: String {
 
-        var descString = "" 
+        var descString = ""
 
-        descString += "count= \(count) " 
-        return descString 
-  } 
-} 
+        descString += "count= \(count) "
+        return descString
+  }
+
+}
 extension wb_count: Equatable {}
 
-public func ==(lhs: wb_count, rhs: wb_count) -> Bool {
+public func == (lhs: wb_count, rhs: wb_count) -> Bool {
     return lhs.count == rhs.count
 }

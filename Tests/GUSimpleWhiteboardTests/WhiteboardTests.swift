@@ -64,16 +64,16 @@ public class WhiteboardTests: XCTestCase {
 
     public static var allTests: [(String, (WhiteboardTests) -> () throws -> Void)] {
         return [
-            ("test_posts", test_posts),
+            ("test_posts", test_posts)
         ]
     }
 
-    private let wb: Whiteboard = Whiteboard()
+    private let wbd: Whiteboard = Whiteboard()
 
     func test_posts() {
         let count = wb_count(count: 7)
-        self.wb.post(count, msg: kCount_v)
-        let fetchedCount: wb_count = self.wb.get(kCount_v)
+        self.wbd.post(count, msg: kCount_v)
+        let fetchedCount: wb_count = self.wbd.get(kCount_v)
         XCTAssertEqual(count, fetchedCount)
     }
 

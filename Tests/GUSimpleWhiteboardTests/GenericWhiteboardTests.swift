@@ -74,13 +74,13 @@ public class GenericWhiteboardTests: XCTestCase {
         ]
     }
 
-    private var wb: Whiteboard = Whiteboard()
-    private var gwb: GenericWhiteboard<wb_count>! 
+    private var wbd: Whiteboard = Whiteboard()
+    private var gwb: GenericWhiteboard<wb_count>!
 
     public override func setUp() {
-        self.gwb = GenericWhiteboard<wb_count>(msgType: kCount_v, wb: self.wb, atomic: false)
+        self.gwb = GenericWhiteboard<wb_count>(msgType: kCount_v, wbd: self.wbd, atomic: false)
         for _ in 0 ..< gwb.generations {
-            self.wb.post(wb_count(count: 0), msg: kCount_v)
+            self.wbd.post(wb_count(count: 0), msg: kCount_v)
         }
         self.gwb.eventCount = 0
         self.gwb.currentIndex = 0
@@ -88,7 +88,7 @@ public class GenericWhiteboardTests: XCTestCase {
 
     public func test_changeIndex() {
         let i: UInt8 = gwb.currentIndex
-        if (0 == i) {
+        if 0 == i {
             gwb.currentIndex = 1
             XCTAssertEqual(gwb.currentIndex, 1)
             return
@@ -138,9 +138,12 @@ public class GenericWhiteboardTests: XCTestCase {
         var i: Int = gwb.generations - 1
         for count: wb_count in gwb {
             XCTAssertEqual(count, wb_count(count: Int64(i)))
-            i = i - 1
+            i -= 1
         }
-        XCTAssertEqual(gwb.orderedMessages, Array(0...(gwb.generations - 1)).reversed().map({wb_count(count: Int64($0))}))
+        XCTAssertEqual(
+            gwb.orderedMessages,
+            Array(0...(gwb.generations - 1)).reversed().map({wb_count(count: Int64($0))})
+        )
     }
 
 }

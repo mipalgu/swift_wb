@@ -63,7 +63,7 @@ import CGUSimpleWhiteboard
  *  message.
  */
 public class GenericWhiteboard<T> {
-    
+
     /**
      *  The type of the message.
      */
@@ -73,19 +73,19 @@ public class GenericWhiteboard<T> {
     private let msgType: wb_types
     private let shouldNotifySubscribers: Bool
     private var procuredCount: UInt8 = 0
-    private let wb: Whiteboard
+    private let wbd: Whiteboard
 
     /**
      *  The current index position of message.
      */
     public var currentIndex: UInt8 {
         get {
-            let _ = self.procure()
+            _ = self.procure()
             let index: UInt8 = self.indexes[self.msgTypeOffset]
-            let _ = self.vacate()
+            _ = self.vacate()
             return index
         } set {
-            if (false == self.procure()) {
+            if false == self.procure() {
                 return
             }
             let indexes: UnsafeBufferPointer<UInt8> = self.indexes
@@ -95,7 +95,7 @@ public class GenericWhiteboard<T> {
             let p = base.advanced(by: self.msgTypeOffset)
             let mu = UnsafeMutablePointer(mutating: p)
             mu.pointee = (newValue % UInt8(generations))
-            let _ = self.vacate()
+            _ = self.vacate()
         }
     }
 
@@ -115,12 +115,12 @@ public class GenericWhiteboard<T> {
      */
     public var eventCount: UInt16 {
         get {
-            let _ = self.procure()
+            _ = self.procure()
             let e: UInt16 = self.eventCounters[self.msgTypeOffset]
-            let _ = self.vacate()
+            _ = self.vacate()
             return e
         } set {
-            if (false == self.procure()) {
+            if false == self.procure() {
                 return
             }
             let eventCounters: UnsafeBufferPointer<UInt16> = self.eventCounters
@@ -130,7 +130,7 @@ public class GenericWhiteboard<T> {
             let p = base.advanced(by: self.msgTypeOffset)
             let mu = UnsafeMutablePointer(mutating: p)
             mu.pointee = newValue
-            let _ = self.vacate()
+            _ = self.vacate()
         }
     }
 
@@ -158,7 +158,7 @@ public class GenericWhiteboard<T> {
      *  An UnsafeMutablePointer to the `gu_simple_whiteboard`.
      */
     public var gsw: UnsafeMutablePointer<gu_simple_whiteboard> {
-        return self.wb.wbd.pointee.wb
+        return self.wbd.wbd.pointee.wb
     }
 
     /**
@@ -175,7 +175,7 @@ public class GenericWhiteboard<T> {
      *  All messages currently stored in the whiteboard.
      */
     public var messages: [Message] {
-        let _ = self.procure()
+        _ = self.procure()
         let allMessages = UnsafeBufferPointer(
             start: &self.gsw.pointee.messages.0,
             count: self.totalMessageTypes
@@ -184,10 +184,10 @@ public class GenericWhiteboard<T> {
             return []
         }
         var messages = p.pointee
-        let first = withUnsafeMutablePointer(to: &messages.0) { $0 } 
+        let first = withUnsafeMutablePointer(to: &messages.0) { $0 }
         let buffer = UnsafeBufferPointer(start: first, count: self.generations)
         guard let base = buffer.baseAddress else {
-            let _ = self.vacate()
+            _ = self.vacate()
             return []
         }
         var arr: [Message] = []
@@ -195,7 +195,7 @@ public class GenericWhiteboard<T> {
         for i in 0..<self.generations {
             arr.append(base.advanced(by: i).withMemoryRebound(to: Message.self, capacity: 1) { $0 }.pointee)
         }
-        let _ = self.vacate()
+        _ = self.vacate()
         return arr
     }
 
@@ -218,19 +218,19 @@ public class GenericWhiteboard<T> {
      */
     public var nextMessage: Message {
         get {
-            let _ = self.procure()
+            _ = self.procure()
             let m: Message = self.messages[Int(self.currentIndex) + 1 % self.generations]
-            let _ = self.vacate()
+            _ = self.vacate()
             return m
         } set {
-            if (false == self.procure()) {
+            if false == self.procure() {
                 return
             }
             let msgno = Int32(self.msgType.rawValue)
-            gsw_next_message(self.wb.wb, msgno).withMemoryRebound(to: Message.self, capacity: 1) {
+            gsw_next_message(self.wbd.wb, msgno).withMemoryRebound(to: Message.self, capacity: 1) {
                 $0.pointee = newValue
             }
-            let _ = self.vacate()
+            _ = self.vacate()
         }
     }
 
@@ -278,14 +278,14 @@ public class GenericWhiteboard<T> {
 
     public init(
         msgType: wb_types,
-        wb: Whiteboard = Whiteboard(),
+        wbd: Whiteboard = Whiteboard(),
         atomic: Bool = true,
         shouldNotifySubscribers: Bool = true
     ) {
         self.atomic = atomic
         self.msgType = msgType
         self.shouldNotifySubscribers = shouldNotifySubscribers
-        self.wb = wb
+        self.wbd = wbd
     }
 
     /**
@@ -294,9 +294,9 @@ public class GenericWhiteboard<T> {
      *  - Returns: The latest `Message` in the whiteboard.
      */
     public func get() -> Message {
-        let _ = self.procure()
-        let m: Message = self.wb.get(self.msgType)
-        let _ = self.vacate()
+        _ = self.procure()
+        let m: Message = self.wbd.get(self.msgType)
+        _ = self.vacate()
         return m
     }
 
@@ -306,10 +306,10 @@ public class GenericWhiteboard<T> {
      *  - Precondition: `shouldNotifySubscribers` is true.
      */
     public func notifySubscribers() {
-        if (false == self.shouldNotifySubscribers) {
+        if false == self.shouldNotifySubscribers {
             return
         }
-        gsw_signal_subscribers(self.wb.wb)
+        gsw_signal_subscribers(self.wbd.wb)
     }
 
     /**
@@ -318,12 +318,12 @@ public class GenericWhiteboard<T> {
      *  - Parameter val: The new `Message`.
      */
     public func post(val: Message) {
-        if (false == self.procure()) {
+        if false == self.procure() {
             return
         }
-        self.wb.post(val, msg: self.msgType)
-        gsw_increment_event_counter(self.wb.wb, Int32(self.msgType.rawValue))
-        let _ = self.vacate()
+        self.wbd.post(val, msg: self.msgType)
+        gsw_increment_event_counter(self.wbd.wb, Int32(self.msgType.rawValue))
+        _ = self.vacate()
         self.notifySubscribers()
     }
 
@@ -335,14 +335,14 @@ public class GenericWhiteboard<T> {
      *  - Returns: A Bool indicating whether the procurement was successful.
      */
     public func procure() -> Bool {
-        if (false == self.atomic || self.procuredCount > 0) {
-            self.procuredCount = self.procuredCount + 1
+        if false == self.atomic || self.procuredCount > 0 {
+            self.procuredCount += 1
             return true
         }
-        let sem = self.wb.wbd.pointee.sem
+        let sem = self.wbd.wbd.pointee.sem
         let procured: Bool = 0 == gsw_procure(sem, GSW_SEM_PUTMSG)
-        if (true == procured) {
-            self.procuredCount = self.procuredCount + 1
+        if true == procured {
+            self.procuredCount += 1
         }
         return procured
     }
@@ -355,13 +355,13 @@ public class GenericWhiteboard<T> {
      *  - Returns: A Bool indicating whether the vacation was successful.
      */
     public func vacate() -> Bool {
-        if (false == self.atomic || self.procuredCount > 1) {
-            self.procuredCount = self.procuredCount - 1
+        if false == self.atomic || self.procuredCount > 1 {
+            self.procuredCount -= 1
             return true
         }
-        let sem = self.wb.wbd.pointee.sem
+        let sem = self.wbd.wbd.pointee.sem
         let vacated: Bool = 0 == gsw_vacate(sem, GSW_SEM_PUTMSG)
-        if (true == vacated) {
+        if true == vacated {
             self.procuredCount = 0
         }
         return vacated
@@ -375,7 +375,7 @@ public class GenericWhiteboard<T> {
 extension GenericWhiteboard: Sequence {
 
     public typealias Element = Message
-    public typealias Iterator = AnyIterator<Element> 
+    public typealias Iterator = AnyIterator<Element>
 
     /**
      *  Returns the messages in the order of `orderedMessages`.
@@ -384,13 +384,13 @@ extension GenericWhiteboard: Sequence {
         let messages: [Element] = self.orderedMessages
         var i: Int = 0
         return AnyIterator {
-            if (i >= messages.count) {
+            if i >= messages.count {
                 return nil
-            } 
+            }
             let j = i
-            i = i + 1
+            i += 1
             return messages[j]
-        } 
+        }
     }
 
 }
