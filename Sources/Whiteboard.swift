@@ -8,6 +8,8 @@
 
 import CGUSimpleWhiteboard
 
+//swiftlint:disable identifier_name
+
 /// Public protocol for blackboard-like functionality
 public protocol Blackboard {
     /// required constructor for a default whiteboard
