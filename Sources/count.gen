@@ -1,0 +1,10 @@
+-author	Callum McColl
+
+-swift
+import CGUSimpleWhiteboard
+
+-properties
+int64_t count // The count.
+
+-comment
+Contains a simple counter.

@@ -1,4 +1,0 @@
-author	Callum McColl
-int64_t	count	The count.
-
-Contains a simple counter.
