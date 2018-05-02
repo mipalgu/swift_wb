@@ -58,6 +58,8 @@
 
 import CGUSimpleWhiteboard
 
+//swiftlint:disable identifier_name
+
 /**
  *  Provides a wrapper around `Whiteboard` that only works with a certain
  *  message.
