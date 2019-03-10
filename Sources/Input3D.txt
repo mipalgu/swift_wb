@@ -1,7 +1,0 @@
-author	Carl Lusty
-int16_t	yaw=0	// yaw
-int16_t	pitch=0	// pitch
-int16_t	roll=0	// roll
-int16_t	power=0	// power value, ie. high of leap hand or thrust of flight simulator
-
-Simple 3 dimensional input class
