@@ -64,17 +64,34 @@ public class WhiteboardTests: XCTestCase {
 
     public static var allTests: [(String, (WhiteboardTests) -> () throws -> Void)] {
         return [
-            ("test_posts", test_posts)
+            ("test_posts", test_posts),
+            ("test_postsWrapper", test_postsWrapper)
         ]
     }
 
     private let wbd: Whiteboard = Whiteboard()
+
+    public override func setUp() {
+        let count = wb_count()
+        self.wbd.post(count, msg: kCount_v)
+    }
 
     func test_posts() {
         let count = wb_count(count: 7)
         self.wbd.post(count, msg: kCount_v)
         let fetchedCount: wb_count = self.wbd.get(kCount_v)
         XCTAssertEqual(count, fetchedCount)
+    }
+
+    func test_postsWrapper() {
+        let count = Count(count: 7)
+        self.wbd.post(count, msg: kCount_v)
+        let fetchedCount: Count = self.wbd.get(kCount_v)
+        XCTAssertEqual(count, fetchedCount)
+        let count2 = Count(count: 9)
+        self.wbd.post(count2, msg: kCount_v)
+        let fetchedCount2: Count = self.wbd.get(kCount_v)
+        XCTAssertEqual(count2, fetchedCount2)
     }
 
 }
