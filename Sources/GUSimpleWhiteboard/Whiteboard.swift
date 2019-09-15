@@ -52,10 +52,21 @@ public struct Whiteboard: Blackboard {
         return gsw_current_message(wb, Int32(msg.rawValue)).withMemoryRebound(to: T.self, capacity: 1) { $0.pointee }
     }
 
+    // get message converting to a swift wrapper.
+    public func get<T>(_ msg: wb_types) -> T where T: WhiteboardTypeConvertible {
+        let currentMessage: T.WhiteboardType = self.get(msg)
+        return T(currentMessage)
+    } 
+
     /// post message template function
     public func post<T>(_ val: T, msg: wb_types) {
         let msgno = Int32(msg.rawValue)
         gsw_next_message(wb, msgno).withMemoryRebound(to: T.self, capacity: 1) { $0.pointee = val }
         gsw_increment(wb, msgno)
+    }
+
+    // post message from swift wrapper template function.
+    public func post<T>(_ val: T, msg: wb_types) where T: WhiteboardTypeConvertible {
+        self.post(val.rawValue, msg: msg)
     }
 }
