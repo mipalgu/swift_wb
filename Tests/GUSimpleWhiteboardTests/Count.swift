@@ -58,6 +58,7 @@
  */
 
 import CGUSimpleWhiteboard
+@testable import GUSimpleWhiteboard
 
 //swiftlint:disable function_body_length
 //swiftlint:disable file_length
@@ -134,4 +135,12 @@ extension wb_count: Equatable {}
 
 public func == (lhs: wb_count, rhs: wb_count) -> Bool {
     return Count(lhs) == Count(rhs)
+}
+
+extension Count: WhiteboardTypeConvertible {
+
+    public var rawValue: wb_count {
+        return self._raw
+    }
+
 }
