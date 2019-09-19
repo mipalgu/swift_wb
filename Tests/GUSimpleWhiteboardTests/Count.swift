@@ -60,6 +60,7 @@
 import CGUSimpleWhiteboard
 @testable import GUSimpleWhiteboard
 
+//swiftlint:disable superfluous_disable_command
 //swiftlint:disable function_body_length
 //swiftlint:disable file_length
 //swiftlint:disable line_length
@@ -79,8 +80,6 @@ public struct Count {
             self._raw.count = newValue
         }
     }
-
-
 
     /**
      * Create a new `wb_count`.
