@@ -56,7 +56,7 @@ public struct Whiteboard: Blackboard {
     public func get<T>(_ msg: wb_types) -> T where T: WhiteboardTypeConvertible {
         let currentMessage: T.WhiteboardType = self.get(msg)
         return T(currentMessage)
-    } 
+    }
 
     /// post message template function
     public func post<T>(_ val: T, msg: wb_types) {
