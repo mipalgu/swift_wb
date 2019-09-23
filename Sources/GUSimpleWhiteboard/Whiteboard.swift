@@ -7,6 +7,7 @@
 //
 
 import CGUSimpleWhiteboard
+@_exported import SwiftWBUtils
 
 //swiftlint:disable identifier_name
 
