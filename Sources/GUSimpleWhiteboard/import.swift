@@ -57,3 +57,4 @@
  */
 
 @_exported import CGUSimpleWhiteboard
+@_exported import SwiftWBUtils
