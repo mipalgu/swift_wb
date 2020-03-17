@@ -57,6 +57,7 @@
  */
 
 import CGUSimpleWhiteboard
+@_exported import SwiftWBUtils
 
 //swiftlint:disable identifier_name
 
@@ -368,6 +369,39 @@ public class GenericWhiteboard<T> {
         }
         return vacated
     }
+
+}
+
+extension GenericWhiteboard where T: WhiteboardTypeConvertible {
+
+    /**
+     *  Retrieve the latest `Message`.
+     *
+     *  - Returns: The latest `Message` in the whiteboard.
+     */
+    public func get() -> Message {
+        _ = self.procure()
+        let m: Message.WhiteboardType = self.wbd.get(self.msgType)
+        _ = self.vacate()
+        return Message(m)
+    }
+
+
+    /**
+     *  Post a new message to the whiteboard.
+     *
+     *  - Parameter val: The new `Message`.
+     */
+    public func post(val: Message) {
+        if false == self.procure() {
+            return
+        }
+        self.wbd.post(val.rawValue, msg: self.msgType)
+        gsw_increment_event_counter(self.wbd.wb, Int32(self.msgType.rawValue))
+        _ = self.vacate()
+        self.notifySubscribers()
+    }
+
 
 }
 
