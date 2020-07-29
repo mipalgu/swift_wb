@@ -141,10 +141,9 @@ public class GenericWhiteboard<T> {
      *  Event counters for all messages types.
      */
     public var eventCounters: UnsafeBufferPointer<UInt16> {
-        return UnsafeBufferPointer(
-            start: &self.gsw.pointee.event_counters.0,
-            count: self.totalMessageTypes
-        )
+        return withUnsafePointer(to: &self.gsw.pointee.event_counters.0) {
+            return UnsafeBufferPointer(start: $0, count: self.totalMessageTypes)
+        }
     }
 
     /**
@@ -168,10 +167,9 @@ public class GenericWhiteboard<T> {
      *  Indexes for all message types.
      */
     public var indexes: UnsafeBufferPointer<UInt8> {
-        return UnsafeBufferPointer(
-            start: &self.gsw.pointee.indexes.0,
-            count: self.totalMessageTypes
-        )
+        return withUnsafePointer(to: &self.gsw.pointee.indexes.0) {
+            return UnsafeBufferPointer(start: $0, count: self.totalMessageTypes)
+        }
     }
 
     /**
@@ -179,10 +177,9 @@ public class GenericWhiteboard<T> {
      */
     public var messages: [Message] {
         _ = self.procure()
-        let allMessages = UnsafeBufferPointer(
-            start: &self.gsw.pointee.messages.0,
-            count: self.totalMessageTypes
-        )
+        let allMessages = withUnsafePointer(to: &self.gsw.pointee.messages.0) {
+            return UnsafeBufferPointer(start: $0, count: self.totalMessageTypes)
+        }
         guard let p = allMessages.baseAddress?.advanced(by: self.msgTypeOffset) else {
             return []
         }
