@@ -28,9 +28,13 @@ public protocol Blackboard {
 
 /// Swift convenience wrapper around gusimplewhiteboard
 public struct Whiteboard: Blackboard {
+    
+    public let _wbd: UnsafeMutableRawPointer
+    
     /// pointer to the underlying C whiteboard implementation
-    let wbd: UnsafeMutablePointer<gu_simple_whiteboard_descriptor>
-
+    public var wbd: UnsafeMutablePointer<gu_simple_whiteboard_descriptor> {
+        _wbd.assumingMemoryBound(to: gu_simple_whiteboard_descriptor.self)
+    }
     /// return ta pointer to the underlying C whiteboard infrastructure
     public var wb: UnsafeMutablePointer<gu_simple_whiteboard> {
         return wbd.pointee.wb
@@ -41,11 +45,11 @@ public struct Whiteboard: Blackboard {
 
     /// constructor for the default, singleton whiteboard
     public init() {
-        self.wbd = get_local_singleton_whiteboard()
+        self._wbd = UnsafeMutableRawPointer(get_local_singleton_whiteboard())
     }
 
     public init(wbd: UnsafeMutablePointer<gu_simple_whiteboard_descriptor>) {
-        self.wbd = wbd
+        self._wbd = UnsafeMutableRawPointer(wbd)
     }
 
     /// get message template function
