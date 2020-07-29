@@ -59,6 +59,8 @@
 import CGUSimpleWhiteboard
 @_exported import SwiftWBUtils
 
+/*
+
 //swiftlint:disable identifier_name
 
 /**
@@ -84,13 +86,14 @@ public class GenericWhiteboard<T> {
     public var currentIndex: UInt8 {
         get {
             _ = self.procure()
+            defer { _ = self.vacate() }
             let index: UInt8 = self.indexes[self.msgTypeOffset]
-            _ = self.vacate()
             return index
         } set {
             if false == self.procure() {
                 return
             }
+            defer { _ = self.vacate() }
             let indexes: UnsafeBufferPointer<UInt8> = self.indexes
             guard let base = indexes.baseAddress else {
                 fatalError("Cannot change currentIndex, indexes has not been initialized")
@@ -98,7 +101,6 @@ public class GenericWhiteboard<T> {
             let p = base.advanced(by: self.msgTypeOffset)
             let mu = UnsafeMutablePointer(mutating: p)
             mu.pointee = (newValue % UInt8(generations))
-            _ = self.vacate()
         }
     }
 
@@ -119,13 +121,14 @@ public class GenericWhiteboard<T> {
     public var eventCount: UInt16 {
         get {
             _ = self.procure()
+            defer { _ = self.vacate() }
             let e: UInt16 = self.eventCounters[self.msgTypeOffset]
-            _ = self.vacate()
             return e
         } set {
             if false == self.procure() {
                 return
             }
+            defer { _ = self.vacate() }
             let eventCounters: UnsafeBufferPointer<UInt16> = self.eventCounters
             guard let base = eventCounters.baseAddress else {
                 fatalError("Cannot change eventCount, eventCounters have not been initialized")
@@ -133,7 +136,6 @@ public class GenericWhiteboard<T> {
             let p = base.advanced(by: self.msgTypeOffset)
             let mu = UnsafeMutablePointer(mutating: p)
             mu.pointee = newValue
-            _ = self.vacate()
         }
     }
 
@@ -177,6 +179,7 @@ public class GenericWhiteboard<T> {
      */
     public var messages: [Message] {
         _ = self.procure()
+        defer { _ = self.vacate() }
         let allMessages = withUnsafePointer(to: &self.gsw.pointee.messages.0) {
             return UnsafeBufferPointer(start: $0, count: self.totalMessageTypes)
         }
@@ -187,7 +190,6 @@ public class GenericWhiteboard<T> {
         let first = withUnsafeMutablePointer(to: &messages.0) { $0 }
         let buffer = UnsafeBufferPointer(start: first, count: self.generations)
         guard let base = buffer.baseAddress else {
-            _ = self.vacate()
             return []
         }
         var arr: [Message] = []
@@ -195,7 +197,6 @@ public class GenericWhiteboard<T> {
         for i in 0..<self.generations {
             arr.append(base.advanced(by: i).withMemoryRebound(to: Message.self, capacity: 1) { $0 }.pointee)
         }
-        _ = self.vacate()
         return arr
     }
 
@@ -219,18 +220,18 @@ public class GenericWhiteboard<T> {
     public var nextMessage: Message {
         get {
             _ = self.procure()
+            defer { _ = self.vacate() }
             let m: Message = self.messages[Int(self.currentIndex) + 1 % self.generations]
-            _ = self.vacate()
             return m
         } set {
             if false == self.procure() {
                 return
             }
+            defer { _ = self.vacate() }
             let msgno = Int32(self.msgType.rawValue)
             gsw_next_message(self.wbd.wb, msgno).withMemoryRebound(to: Message.self, capacity: 1) {
                 $0.pointee = newValue
             }
-            _ = self.vacate()
         }
     }
 
@@ -295,8 +296,8 @@ public class GenericWhiteboard<T> {
      */
     public func get() -> Message {
         _ = self.procure()
+        defer { _ = self.vacate() }
         let m: Message = self.wbd.get(self.msgType)
-        _ = self.vacate()
         return m
     }
 
@@ -321,9 +322,9 @@ public class GenericWhiteboard<T> {
         if false == self.procure() {
             return
         }
+        defer { _ = self.vacate() }
         self.wbd.post(val, msg: self.msgType)
         gsw_increment_event_counter(self.wbd.wb, Int32(self.msgType.rawValue))
-        _ = self.vacate()
         self.notifySubscribers()
     }
 
@@ -378,8 +379,8 @@ extension GenericWhiteboard where T: WhiteboardTypeConvertible {
      */
     public func get() -> Message {
         _ = self.procure()
+        defer { _ = self.vacate() }
         let m: Message.WhiteboardType = self.wbd.get(self.msgType)
-        _ = self.vacate()
         return Message(m)
     }
 
@@ -393,9 +394,9 @@ extension GenericWhiteboard where T: WhiteboardTypeConvertible {
         if false == self.procure() {
             return
         }
+        defer { _ = self.vacate() }
         self.wbd.post(val.rawValue, msg: self.msgType)
         gsw_increment_event_counter(self.wbd.wb, Int32(self.msgType.rawValue))
-        _ = self.vacate()
         self.notifySubscribers()
     }
 
@@ -427,3 +428,4 @@ extension GenericWhiteboard: Sequence {
     }
 
 }
+*/
