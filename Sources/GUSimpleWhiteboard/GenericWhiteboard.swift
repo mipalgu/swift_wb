@@ -59,8 +59,6 @@
 import CGUSimpleWhiteboard
 @_exported import SwiftWBUtils
 
-/*
-
 //swiftlint:disable identifier_name
 
 /**
@@ -428,4 +426,3 @@ extension GenericWhiteboard: Sequence {
     }
 
 }
-*/
