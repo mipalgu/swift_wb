@@ -1,4 +1,4 @@
-// swift-tools-version:4.0
+// swift-tools-version:5.0
 
 import PackageDescription
 
@@ -11,11 +11,11 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "ssh://git.mipal.net/git/CGUSimpleWhiteboard", .branch("master")),
         .package(url: "ssh://git.mipal.net/git/SwiftWBUtils.git", .branch("master"))
     ],
     targets: [
-        .target(name: "GUSimpleWhiteboard", dependencies: ["SwiftWBUtils"]),
+        .systemLibrary(name: "CGUSimpleWhiteboard", pkgConfig: "libgusimplewhiteboard"),
+        .target(name: "GUSimpleWhiteboard", dependencies: ["SwiftWBUtils", "CGUSimpleWhiteboard"]),
         .testTarget(name: "GUSimpleWhiteboardTests", dependencies: ["GUSimpleWhiteboard"])
     ]
 )
