@@ -1,7 +1,6 @@
-module CGUSimpleWhiteboard [system] [swift_infer_import_as_member] {
-	header "gusimplewhiteboard_bridging.h"
-
+module CGUSimpleWhiteboard [system] {
 	link "gusimplewhiteboard"
-
+	umbrella header "gusimplewhiteboard_bridging.h"
 	export *
+    module * { export * }
 }
