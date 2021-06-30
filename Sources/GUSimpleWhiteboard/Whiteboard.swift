@@ -41,7 +41,7 @@ public struct Whiteboard: Blackboard {
     }
 
     /// convenience class variable denoting the number of defined wb types
-    public static var number_of_messages: Int32 { return GSW_NUM_TYPES_DEFINED }
+    public static var number_of_messages: Int32 { return CGUSimpleWhiteboard.num_types_defined }
 
     /// constructor for the default, singleton whiteboard
     public init() {
