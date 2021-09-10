@@ -11,7 +11,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "ssh://git.mipal.net/Users/Shared/git/SwiftWBUtils.git", .branch("master"))
+        .package(url: "git@github.com:mipalgu/SwiftWBUtils.git", .branch("main"))
     ],
     targets: [
         .systemLibrary(name: "CGUSimpleWhiteboard", pkgConfig: "libgusimplewhiteboard"),
